@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Dict, Optional
 from .entities import User, Profile
+from datetime import timedelta
 
 class UserRepository(ABC):
     @abstractmethod
@@ -39,4 +40,24 @@ class ProfileRepository(ABC):
         
     @abstractmethod
     def update(self, profile: Profile) -> Profile:
+        pass
+
+# Puerto para Hashing (Argon2 vivirá detrás de esto)
+class PasswordHasher(ABC):
+    @abstractmethod
+    def verify(self, plain_password: str, hashed_password: str) -> bool:
+        pass
+
+    @abstractmethod
+    def hash(self, password: str) -> str:
+        pass
+
+# Puerto para Tokens (JWT vivirá detrás de esto)
+class TokenManager(ABC):
+    @abstractmethod
+    def create_access_token(self, data: Dict, expires_delta: Optional[timedelta] = None) -> str:
+        pass
+    
+    @abstractmethod
+    def decode_token(self, token: str) -> Dict:
         pass
