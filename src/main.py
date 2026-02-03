@@ -3,8 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from src.infrastructure.data_base.main import create_db_and_tables
-from src.interface.api.routers import auth_controller as auth
-from src.interface.api.routers import profile_controller as profile
+from src.interface.api.routers import auth_controller, profile_controller, project_controller, technology_controller, work_experience_controller, client_controller, social_controller, images_controller
 
 # --- LIFESPAN ---
 @asynccontextmanager
@@ -38,8 +37,14 @@ app.add_middleware(
 )
 
 # --- ROUTERS ---
-app.include_router(auth.router)
-app.include_router(profile.router)
+app.include_router(auth_controller.router)
+app.include_router(profile_controller.router)
+app.include_router(project_controller.router)
+app.include_router(technology_controller.router)
+app.include_router(work_experience_controller.router)
+app.include_router(client_controller.router)
+app.include_router(social_controller.router)
+app.include_router(images_controller.router)
 
 @app.get("/", tags=["Health"])
 def root():

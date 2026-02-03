@@ -183,3 +183,56 @@ class ProjectResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# --- CLIENT DTOs ---
+
+class ClientCreateRequest(BaseModel):
+    name: str = Field(..., min_length=2)
+    company: Optional[str] = None
+    feedback: Optional[str] = None
+    client_photo_url: Optional[str] = None
+    project_link: Optional[str] = None
+
+class ClientUpdateRequest(BaseModel):
+    name: Optional[str] = Field(None, min_length=2)
+    company: Optional[str] = None
+    feedback: Optional[str] = None
+    client_photo_url: Optional[str] = None
+    project_link: Optional[str] = None
+
+class ClientResponse(BaseModel):
+    id: int
+    profile_id: int
+    name: str
+    company: Optional[str]
+    feedback: Optional[str]
+    client_photo_url: Optional[str]
+    project_link: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+# --- SOCIAL DTOs ---
+
+class SocialCreateRequest(BaseModel):
+    platform: str = Field(..., min_length=2)
+    url: str
+    icon_name: Optional[str] = None
+    order: int = 0
+
+class SocialUpdateRequest(BaseModel):
+    platform: Optional[str] = Field(None, min_length=2)
+    url: Optional[str] = None
+    icon_name: Optional[str] = None
+    order: Optional[int] = None
+
+class SocialResponse(BaseModel):
+    id: int
+    profile_id: int
+    platform: str
+    url: str
+    icon_name: Optional[str]
+    order: int
+
+    class Config:
+        from_attributes = True

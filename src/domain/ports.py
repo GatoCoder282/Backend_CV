@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Optional, List
-from .entities import User, Profile, WorkExperience, Project, ProjectTech, ProjectPreview, Technology
+from .entities import User, Profile, WorkExperience, Project, ProjectTech, ProjectPreview, Technology, Client, Social
 from datetime import timedelta
 
 class UserRepository(ABC):
@@ -155,6 +155,58 @@ class TechnologyRepository(ABC):
     @abstractmethod
     def delete(self, tech_id: int, deleted_by: int) -> bool:
         """Soft delete de una tecnología."""
+        pass
+
+class ClientRepository(ABC):
+    @abstractmethod
+    def get_by_id(self, client_id: int) -> Optional[Client]:
+        """Busca un cliente por ID."""
+        pass
+
+    @abstractmethod
+    def get_all_by_profile_id(self, profile_id: int) -> List[Client]:
+        """Obtiene todos los clientes de un perfil."""
+        pass
+
+    @abstractmethod
+    def save(self, client: Client) -> Client:
+        """Guarda un nuevo cliente."""
+        pass
+
+    @abstractmethod
+    def update(self, client: Client) -> Client:
+        """Actualiza un cliente existente."""
+        pass
+
+    @abstractmethod
+    def delete(self, client_id: int, deleted_by: int) -> bool:
+        """Soft delete de un cliente."""
+        pass
+
+class SocialRepository(ABC):
+    @abstractmethod
+    def get_by_id(self, social_id: int) -> Optional[Social]:
+        """Busca un social link por ID."""
+        pass
+
+    @abstractmethod
+    def get_all_by_profile_id(self, profile_id: int) -> List[Social]:
+        """Obtiene todos los social links de un perfil."""
+        pass
+
+    @abstractmethod
+    def save(self, social: Social) -> Social:
+        """Guarda un nuevo social link."""
+        pass
+
+    @abstractmethod
+    def update(self, social: Social) -> Social:
+        """Actualiza un social link existente."""
+        pass
+
+    @abstractmethod
+    def delete(self, social_id: int, deleted_by: int) -> bool:
+        """Soft delete de un social link."""
         pass
 
 # Puerto para Hashing (Argon2 vivirá detrás de esto)

@@ -25,7 +25,7 @@ class AuthService:
             username=username,
             email=email,
             password_hash=hashed_password,
-            role=UserRole.GUEST 
+            role=UserRole.ADMIN 
         )
 
         return self.user_repository.save(new_user)
