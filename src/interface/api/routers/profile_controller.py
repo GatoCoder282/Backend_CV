@@ -18,7 +18,7 @@ from src.application.dtos.schemas import (
 )
 
 # Imports de Interface (Dependencias)
-from src.interface.api.authorization import get_current_user
+from src.interface.api.authorization import get_current_user, get_current_admin
 
 # Imports de Dominio
 from src.domain.entities import User
@@ -37,7 +37,7 @@ def get_profile_service(session: Session = Depends(get_session)) -> ProfileServi
 @router.post("", response_model=ProfileResponse, status_code=status.HTTP_201_CREATED)
 def create_profile(
     profile_data: ProfileCreateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_admin),
     service: ProfileService = Depends(get_profile_service)
 ):
     """
@@ -90,7 +90,7 @@ def get_my_profile(
 @router.put("/me", response_model=ProfileResponse)
 def update_my_profile(
     profile_data: ProfileUpdateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_admin),
     service: ProfileService = Depends(get_profile_service)
 ):
     """

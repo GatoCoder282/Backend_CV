@@ -94,6 +94,7 @@ class TechnologyModel(SQLModel, table=True):
     __tablename__ = "technologies"
 
     id: Optional[int] = Field(default=None, primary_key=True)
+    profile_id: int = Field(foreign_key="profiles.id")
     name: str
     category: str  # Enum como string
     icon_url: Optional[str] = None

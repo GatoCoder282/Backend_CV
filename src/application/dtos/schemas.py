@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 from pydantic import BaseModel, EmailStr, Field
+from src.domain.entities import TechnologyCategory, ProjectCategory
 
 # DTO para recibir datos (Input)
 class UserRegisterRequest(BaseModel):
@@ -100,5 +101,85 @@ class WorkExperienceResponse(BaseModel):
     end_date: Optional[date]
     description: Optional[str]
     
+    class Config:
+        from_attributes = True
+
+# --- TECHNOLOGY DTOs ---
+
+class TechnologyCreateRequest(BaseModel):
+    name: str = Field(..., min_length=2)
+    category: TechnologyCategory
+    icon_url: Optional[str] = None
+
+class TechnologyUpdateRequest(BaseModel):
+    name: Optional[str] = Field(None, min_length=2)
+    category: Optional[TechnologyCategory] = None
+    icon_url: Optional[str] = None
+
+class TechnologyResponse(BaseModel):
+    id: int
+    profile_id: int
+    name: str
+    category: TechnologyCategory
+    icon_url: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+# --- PROJECT DTOs ---
+
+class ProjectPreviewCreateRequest(BaseModel):
+    image_url: str
+    caption: Optional[str] = None
+    order: int = 0
+
+class ProjectPreviewResponse(BaseModel):
+    id: int
+    project_id: int
+    image_url: str
+    caption: Optional[str]
+    order: int
+
+    class Config:
+        from_attributes = True
+
+class ProjectCreateRequest(BaseModel):
+    title: str = Field(..., min_length=2)
+    category: ProjectCategory
+    description: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    live_url: Optional[str] = None
+    repo_url: Optional[str] = None
+    featured: bool = False
+    work_experience_id: Optional[int] = None
+    technology_ids: List[int] = []
+    previews: List[ProjectPreviewCreateRequest] = []
+
+class ProjectUpdateRequest(BaseModel):
+    title: Optional[str] = Field(None, min_length=2)
+    category: Optional[ProjectCategory] = None
+    description: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    live_url: Optional[str] = None
+    repo_url: Optional[str] = None
+    featured: Optional[bool] = None
+    work_experience_id: Optional[int] = None
+    technology_ids: Optional[List[int]] = None
+    previews: Optional[List[ProjectPreviewCreateRequest]] = None
+
+class ProjectResponse(BaseModel):
+    id: int
+    profile_id: int
+    title: str
+    category: ProjectCategory
+    description: Optional[str]
+    thumbnail_url: Optional[str]
+    live_url: Optional[str]
+    repo_url: Optional[str]
+    featured: bool
+    work_experience_id: Optional[int]
+    technology_ids: List[int] = []
+    previews: List[ProjectPreviewResponse] = []
+
     class Config:
         from_attributes = True

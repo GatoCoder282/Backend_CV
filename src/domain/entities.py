@@ -139,7 +139,6 @@ class Project:
     repo_url: Optional[str] = None
     featured: bool = False
     
-    # Relación opcional: proyecto desarrollado en una experiencia laboral
     work_experience_id: Optional[int] = None
 
     id: Optional[int] = None
@@ -154,6 +153,7 @@ class Project:
 
 @dataclass
 class Technology:
+    profile_id: int
     name: str
     category: TechnologyCategory
     icon_url: Optional[str] = None

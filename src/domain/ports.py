@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Optional, List
-from .entities import User, Profile, WorkExperience
+from .entities import User, Profile, WorkExperience, Project, ProjectTech, ProjectPreview, Technology
 from datetime import timedelta
 
 class UserRepository(ABC):
@@ -66,6 +66,95 @@ class WorkExperienceRepository(ABC):
     @abstractmethod
     def delete(self, work_experience_id: int, deleted_by: int) -> bool:
         """Soft delete de una experiencia laboral."""
+        pass
+
+class ProjectRepository(ABC):
+    @abstractmethod
+    def get_by_id(self, project_id: int) -> Optional[Project]:
+        """Busca un proyecto por ID."""
+        pass
+
+    @abstractmethod
+    def get_all_by_profile_id(self, profile_id: int) -> List[Project]:
+        """Obtiene todos los proyectos de un perfil."""
+        pass
+
+    @abstractmethod
+    def get_featured_by_profile_id(self, profile_id: int) -> List[Project]:
+        """Obtiene solo los proyectos destacados de un perfil."""
+        pass
+
+    @abstractmethod
+    def save(self, project: Project) -> Project:
+        """Guarda un nuevo proyecto."""
+        pass
+
+    @abstractmethod
+    def update(self, project: Project) -> Project:
+        """Actualiza un proyecto existente."""
+        pass
+
+    @abstractmethod
+    def delete(self, project_id: int, deleted_by: int) -> bool:
+        """Soft delete de un proyecto."""
+        pass
+
+class ProjectTechRepository(ABC):
+    @abstractmethod
+    def get_technologies_by_project_id(self, project_id: int) -> List[int]:
+        """Obtiene los IDs de tecnologías asociadas a un proyecto."""
+        pass
+
+    @abstractmethod
+    def save(self, project_tech: ProjectTech) -> ProjectTech:
+        """Asocia una tecnología a un proyecto."""
+        pass
+
+    @abstractmethod
+    def delete_by_project_id(self, project_id: int) -> bool:
+        """Elimina todas las asociaciones de tecnologías de un proyecto."""
+        pass
+
+class ProjectPreviewRepository(ABC):
+    @abstractmethod
+    def get_by_project_id(self, project_id: int) -> List[ProjectPreview]:
+        """Obtiene todas las imágenes de preview de un proyecto."""
+        pass
+
+    @abstractmethod
+    def save(self, preview: ProjectPreview) -> ProjectPreview:
+        """Guarda una nueva imagen de preview."""
+        pass
+
+    @abstractmethod
+    def delete(self, preview_id: int) -> bool:
+        """Elimina una imagen de preview."""
+        pass
+
+class TechnologyRepository(ABC):
+    @abstractmethod
+    def get_by_id(self, tech_id: int) -> Optional[Technology]:
+        """Busca una tecnología por ID."""
+        pass
+
+    @abstractmethod
+    def get_all_by_profile_id(self, profile_id: int) -> List[Technology]:
+        """Obtiene todas las tecnologías activas de un perfil."""
+        pass
+
+    @abstractmethod
+    def save(self, technology: Technology) -> Technology:
+        """Guarda una nueva tecnología."""
+        pass
+
+    @abstractmethod
+    def update(self, technology: Technology) -> Technology:
+        """Actualiza una tecnología existente."""
+        pass
+
+    @abstractmethod
+    def delete(self, tech_id: int, deleted_by: int) -> bool:
+        """Soft delete de una tecnología."""
         pass
 
 # Puerto para Hashing (Argon2 vivirá detrás de esto)

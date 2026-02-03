@@ -20,7 +20,7 @@ from src.application.dtos.schemas import (
 )
 
 # Imports de Interface (Dependencias)
-from src.interface.api.authorization import get_current_user
+from src.interface.api.authorization import get_current_user, get_current_admin
 
 # Imports de Dominio
 from src.domain.entities import User
@@ -40,7 +40,7 @@ def get_work_experience_service(session: Session = Depends(get_session)) -> Work
 @router.post("", response_model=WorkExperienceResponse, status_code=status.HTTP_201_CREATED)
 def create_work_experience(
     work_exp_data: WorkExperienceCreateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_admin),
     service: WorkExperienceService = Depends(get_work_experience_service)
 ):
     """
@@ -115,7 +115,7 @@ def get_work_experience(
 def update_work_experience(
     work_experience_id: int,
     work_exp_data: WorkExperienceUpdateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_admin),
     service: WorkExperienceService = Depends(get_work_experience_service)
 ):
     """
@@ -153,7 +153,7 @@ def update_work_experience(
 @router.delete("/{work_experience_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_work_experience(
     work_experience_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_admin),
     service: WorkExperienceService = Depends(get_work_experience_service)
 ):
     """
