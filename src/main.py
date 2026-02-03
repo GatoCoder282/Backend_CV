@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from src.infrastructure.data_base.main import create_db_and_tables
 from src.interface.api.routers import auth_controller as auth
+from src.interface.api.routers import profile_controller as profile
 
 # --- LIFESPAN ---
 @asynccontextmanager
@@ -38,6 +39,7 @@ app.add_middleware(
 
 # --- ROUTERS ---
 app.include_router(auth.router)
+app.include_router(profile.router)
 
 @app.get("/", tags=["Health"])
 def root():

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from enum import Enum
 from .exceptions import InvalidUserError
@@ -7,6 +7,22 @@ from .exceptions import InvalidUserError
 class UserRole(str, Enum):
     ADMIN = "admin"
     GUEST = "guest"
+
+class ProjectCategory(str, Enum):
+    FULLSTACK = "fullstack"
+    BACKEND = "backend"
+    FRONTEND = "frontend"
+
+class TechnologyCategory(str, Enum):
+    FRONTEND = "frontend"
+    BACKEND = "backend"
+    DATABASES = "databases"
+    APIS = "apis"
+    DEV_TOOLS = "dev_tools"
+    CLOUD = "cloud"
+    TESTING = "testing"
+    ARCHITECTURE = "architecture"
+    SECURITY = "security"
 
 @dataclass
 class User:
@@ -18,6 +34,10 @@ class User:
     id: Optional[int] = None
     last_login: Optional[datetime] = None
     created_at: datetime = field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
 
     def __post_init__(self):
         """Validación de Dominio: Reglas que SIEMPRE deben cumplirse."""
@@ -49,6 +69,10 @@ class Profile:
     # Auditoría
     id: Optional[int] = None
     created_at: datetime = field(default_factory=datetime.now)
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
 
     def __post_init__(self):
         """
@@ -81,3 +105,128 @@ class Profile:
         if len(new_bio) > 500:
             raise InvalidUserError("La biografía no puede exceder 500 caracteres.")
         self.bio_summary = new_bio
+
+@dataclass
+class WorkExperience:
+    profile_id: int
+    job_title: str
+    company: str
+    location: Optional[str] = None
+    start_date: date = field(default_factory=date.today)
+    end_date: Optional[date] = None
+    description: Optional[str] = None
+
+    id: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+    def __post_init__(self):
+        if not self.job_title or not self.company:
+            raise InvalidUserError("El cargo y la empresa son obligatorios.")
+        if self.end_date and self.end_date < self.start_date:
+            raise InvalidUserError("La fecha de fin no puede ser anterior a la de inicio.")
+
+@dataclass
+class Project:
+    profile_id: int
+    title: str
+    category: ProjectCategory
+    description: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    live_url: Optional[str] = None
+    repo_url: Optional[str] = None
+    featured: bool = False
+    
+    # Relación opcional: proyecto desarrollado en una experiencia laboral
+    work_experience_id: Optional[int] = None
+
+    id: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+    def __post_init__(self):
+        if not self.title:
+            raise InvalidUserError("El título del proyecto es obligatorio.")
+
+@dataclass
+class Technology:
+    name: str
+    category: TechnologyCategory
+    icon_url: Optional[str] = None
+
+    id: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+    def __post_init__(self):
+        if not self.name:
+            raise InvalidUserError("El nombre de la tecnología es obligatorio.")
+
+@dataclass
+class ProjectTech:
+    project_id: int
+    tech_id: int
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+@dataclass
+class Client:
+    profile_id: int
+    name: str
+    company: Optional[str] = None
+    feedback: Optional[str] = None
+    client_photo_url: Optional[str] = None
+    project_link: Optional[str] = None
+
+    id: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+    def __post_init__(self):
+        if not self.name:
+            raise InvalidUserError("El nombre del cliente es obligatorio.")
+
+@dataclass
+class Social:
+    profile_id: int
+    platform: str  # Ej: "GitHub", "LinkedIn", "Twitter"
+    url: str
+    icon_name: Optional[str] = None  # Para el icono a mostrar
+    order: int = 0  # Para ordenar los links
+
+    id: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+    def __post_init__(self):
+        if not self.platform or not self.url:
+            raise InvalidUserError("La plataforma y la URL son obligatorios.")
+
+@dataclass
+class ProjectPreview:
+    project_id: int
+    image_url: str
+    caption: Optional[str] = None
+    order: int = 0  # Para ordenar las imágenes en el carrusel
+
+    id: Optional[int] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    is_active: bool = True
+
+    def __post_init__(self):
+        if not self.image_url:
+            raise InvalidUserError("La URL de la imagen es obligatoria.")

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
-from .entities import User, Profile
+from typing import Dict, Optional, List
+from .entities import User, Profile, WorkExperience
 from datetime import timedelta
 
 class UserRepository(ABC):
@@ -40,6 +40,32 @@ class ProfileRepository(ABC):
         
     @abstractmethod
     def update(self, profile: Profile) -> Profile:
+        pass
+
+class WorkExperienceRepository(ABC):
+    @abstractmethod
+    def get_by_id(self, work_experience_id: int) -> Optional[WorkExperience]:
+        """Busca una experiencia laboral por ID."""
+        pass
+
+    @abstractmethod
+    def get_all_by_profile_id(self, profile_id: int) -> List[WorkExperience]:
+        """Obtiene todas las experiencias laborales de un perfil."""
+        pass
+
+    @abstractmethod
+    def save(self, work_experience: WorkExperience) -> WorkExperience:
+        """Guarda una nueva experiencia laboral."""
+        pass
+
+    @abstractmethod
+    def update(self, work_experience: WorkExperience) -> WorkExperience:
+        """Actualiza una experiencia laboral existente."""
+        pass
+
+    @abstractmethod
+    def delete(self, work_experience_id: int, deleted_by: int) -> bool:
+        """Soft delete de una experiencia laboral."""
         pass
 
 # Puerto para Hashing (Argon2 vivirá detrás de esto)

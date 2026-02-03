@@ -20,7 +20,11 @@ class SqlAlchemyUserRepository(UserRepository):
             password_hash=model.password_hash,
             role=UserRole(model.role), # Convertimos string "admin" a Enum UserRole.ADMIN
             last_login=model.last_login,
-            created_at=model.created_at
+            created_at=model.created_at,
+            updated_at=model.updated_at,
+            created_by=model.created_by,
+            updated_by=model.updated_by,
+            is_active=model.is_active
         )
 
     def _to_model(self, entity: User) -> UserModel:
@@ -34,7 +38,11 @@ class SqlAlchemyUserRepository(UserRepository):
             password_hash=entity.password_hash,
             role=entity.role.value, # Guardamos el valor del Enum ("admin")
             last_login=entity.last_login,
-            created_at=entity.created_at
+            created_at=entity.created_at,
+            updated_at=entity.updated_at,
+            created_by=entity.created_by,
+            updated_by=entity.updated_by,
+            is_active=entity.is_active
         )
 
     def get_by_id(self, user_id: int) -> Optional[User]:
@@ -78,6 +86,9 @@ class SqlAlchemyUserRepository(UserRepository):
             existing_model.password_hash = user.password_hash
             existing_model.role = user.role.value
             existing_model.last_login = user.last_login
+            existing_model.updated_at = user.updated_at
+            existing_model.updated_by = user.updated_by
+            existing_model.is_active = user.is_active
             
             # 3. Guardamos cambios
             self.session.add(existing_model)
