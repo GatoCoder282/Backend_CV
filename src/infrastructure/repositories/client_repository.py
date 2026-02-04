@@ -1,7 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
-from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlmodel import Session, select
 
 from src.domain.ports import ClientRepository
 from src.domain.entities import Client

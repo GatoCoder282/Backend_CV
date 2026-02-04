@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     environment: str = "dev"
 
+    superadmin_email: str
+
+    cloudinary_cloud_name: str
+    cloudinary_api_key: str
+    cloudinary_api_secret: str
+
     # Configuración para leer el archivo .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

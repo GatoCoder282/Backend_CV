@@ -102,7 +102,7 @@ def update_my_profile(
             user_id=current_user.id,
             name=profile_data.name,
             last_name=profile_data.last_name,
-            email=current_user.email if profile_data.name or profile_data.last_name else None,
+            email=current_user.email,
             current_title=profile_data.current_title,
             bio_summary=profile_data.bio_summary,
             phone=profile_data.phone,

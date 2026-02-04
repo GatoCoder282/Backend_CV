@@ -60,14 +60,14 @@ class SqlAlchemyProfileRepository(ProfileRepository):
 		return self._to_domain(profile_model)
 
 	def update(self, profile: Profile) -> Profile:
-		statement = None
 		if profile.id is not None:
 			statement = select(ProfileModel).where(ProfileModel.id == profile.id)
 		else:
 			statement = select(ProfileModel).where(ProfileModel.user_id == profile.user_id)
 
-		existing_model = self.session.exec(statement).first() if statement else None
-
+		existing_model = self.session.exec(statement).first()
+		
+        
 		if existing_model:
 			existing_model.name = profile.name
 			existing_model.last_name = profile.last_name

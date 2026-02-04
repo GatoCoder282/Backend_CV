@@ -43,10 +43,25 @@ def get_current_user(
     return user
 
 def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
-    """Guardian estricto para rutas de Admin (CMS)."""
-    if current_user.role != UserRole.ADMIN:
+    """
+    Guardian para rutas que requieren permisos de administración.
+    Permite tanto ADMIN como SUPERADMIN (ambos pueden administrar contenido).
+    """
+    if current_user.role not in [UserRole.ADMIN, UserRole.SUPERADMIN]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Se requieren permisos de administrador"
+        )
+    return current_user
+
+def get_current_superadmin(current_user: User = Depends(get_current_user)) -> User:
+    """
+    Guardian estricto solo para SUPERADMIN.
+    Úsalo para operaciones críticas del sistema (ej: eliminar usuarios, cambiar roles, etc).
+    """
+    if current_user.role != UserRole.SUPERADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren permisos de superadministrador"
         )
     return current_user

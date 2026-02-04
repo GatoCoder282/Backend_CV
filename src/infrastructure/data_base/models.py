@@ -11,7 +11,7 @@ class UserModel(SQLModel, table=True):
     username: str = Field(unique=True, index=True)
     email: str = Field(unique=True, index=True)
     password_hash: str
-    role: str = Field(default=UserRole.GUEST.value) # Guardamos el string del Enum
+    role: str = Field(default=UserRole.ADMIN.value) # Guardamos el string del Enum
     
     last_login: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.now)

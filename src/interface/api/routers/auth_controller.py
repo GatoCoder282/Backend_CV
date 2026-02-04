@@ -17,6 +17,7 @@ from src.interface.api.authorization import get_current_user, get_current_admin
 
 # Imports de Dominio
 from src.domain.entities import User
+from src.domain.exceptions import UserAlreadyExistsError
 
 # Definimos el router (estándar: llamarlo 'router')
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -39,13 +40,24 @@ def register(
     user_data: UserRegisterRequest, 
     service: AuthService = Depends(get_auth_service)
 ):
-    """Cualquiera puede registrarse."""
-    new_user = service.register_user(
-        username=user_data.username,
-        email=user_data.email,
-        password=user_data.password
-    )
-    return new_user
+    """
+    Registro de usuarios:
+    - Por defecto crea ADMIN (pueden administrar su propio portfolio/CMS)
+    - Si el email coincide con SUPERADMIN_EMAIL, crea SUPERADMIN automáticamente
+    - Multi-tenant: cada usuario solo puede editar su propio contenido
+    """
+    try:
+        new_user = service.register_user(
+            username=user_data.username,
+            email=user_data.email,
+            password=user_data.password
+        )
+        return new_user
+    except UserAlreadyExistsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc)
+        )
 
 @router.post("/login", response_model=TokenResponse)
 def login(

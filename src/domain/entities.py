@@ -6,7 +6,7 @@ from .exceptions import InvalidUserError
 
 class UserRole(str, Enum):
     ADMIN = "admin"
-    GUEST = "guest"
+    SUPERADMIN = "superadmin"
 
 class ProjectCategory(str, Enum):
     FULLSTACK = "fullstack"
@@ -29,7 +29,7 @@ class User:
     username: str
     email: str
     password_hash: str
-    role: UserRole = UserRole.GUEST
+    role: UserRole = UserRole.ADMIN
     
     id: Optional[int] = None
     last_login: Optional[datetime] = None
@@ -83,17 +83,17 @@ class Profile:
         # 1. Normalización (Limpieza y Formato)
         # .strip() quita espacios adelante y atrás
         # .title() pone Mayúscula A Cada Palabra (soporta "Juan Carlos")
-        if self.name:
-            self.name = " ".join(self.name.split()).title()
+        if self.name is not None:
+            self.name = " ".join(str(self.name).split()).title()
         
-        if self.last_name:
-            self.last_name = " ".join(self.last_name.split()).title()
+        if self.last_name is not None:
+            self.last_name = " ".join(str(self.last_name).split()).title()
 
-        if self.email:
-             self.email = self.email.strip().lower() # Emails siempre en minúscula
+        if self.email is not None:
+             self.email = str(self.email).strip().lower() # Emails siempre en minúscula
 
         # 2. Validación (Reglas de Negocio)
-        if not self.name or not self.last_name:
+        if self.name is None or self.name == "" or self.last_name is None or self.last_name == "":
             raise InvalidUserError("El nombre y el apellido son obligatorios.")
 
     @property

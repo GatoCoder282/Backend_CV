@@ -1,4 +1,5 @@
 from typing import Optional
+import os
 from src.domain.entities import User, UserRole
 from src.domain.ports import UserRepository, PasswordHasher, TokenManager
 from src.domain.exceptions import UserAlreadyExistsError
@@ -17,15 +18,21 @@ class AuthService:
     def register_user(self, username: str, email: str, password: str) -> User:
         if self.user_repository.get_by_email(email):
             raise UserAlreadyExistsError(f"El email {email} ya está registrado.")
+        if self.user_repository.get_by_username(username):
+            raise UserAlreadyExistsError(f"El username {username} ya está registrado.")
         
         # Usamos el puerto (sin saber que es Argon2)
         hashed_password = self.hasher.hash(password)
+
+        # Determinar rol: SUPERADMIN si coincide con el email de la variable de entorno
+        superadmin_email = os.getenv("SUPERADMIN_EMAIL", "")
+        user_role = UserRole.SUPERADMIN if email == superadmin_email else UserRole.ADMIN
 
         new_user = User(
             username=username,
             email=email,
             password_hash=hashed_password,
-            role=UserRole.ADMIN 
+            role=user_role
         )
 
         return self.user_repository.save(new_user)
