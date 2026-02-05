@@ -4,5 +4,10 @@ pydantic==2.12.5
 pydantic-settings==2.12.0
 python-dotenv==1.2.1
 sqlmodel==0.0.22
+sqlalchemy==2.0.43
 email-validator==2.3.0
 python-multipart==0.0.22
+passlib[argon2]==1.7.4
+python-jose[cryptography]==3.5.0
+cloudinary==1.44.1
+pytest==8.3.5
