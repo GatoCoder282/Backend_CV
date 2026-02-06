@@ -65,6 +65,7 @@ class Profile:
     phone: Optional[str] = None
     location: Optional[str] = "Cochabamba, Bolivia"
     photo_url: Optional[str] = None
+    profile: Optional[str] = None
     
     # Auditoría
     id: Optional[int] = None

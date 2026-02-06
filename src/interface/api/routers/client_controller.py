@@ -6,6 +6,7 @@ from typing import List
 from src.infrastructure.data_base.main import get_session
 from src.infrastructure.repositories.client_repository import SqlAlchemyClientRepository
 from src.infrastructure.repositories.profile_repository import SqlAlchemyProfileRepository
+from src.infrastructure.repositories.user_repository import SqlAlchemyUserRepository
 
 # Imports de Aplicación
 from src.application.services.client_service import (
@@ -166,4 +167,47 @@ def delete_client(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(e)
+        )
+
+# --- ENDPOINTS PÚBLICOS ---
+
+@router.get("/public/{username}", response_model=List[ClientResponse])
+def get_public_clients(
+    username: str,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene todos los clientes de un usuario por su username.
+    No requiere autenticación.
+    """
+    try:
+        # Buscar usuario por username
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        # Buscar perfil del usuario
+        profile_repo = SqlAlchemyProfileRepository(session)
+        profile = profile_repo.get_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Perfil no encontrado."
+            )
+        
+        # Obtener clientes
+        client_repo = SqlAlchemyClientRepository(session)
+        clients = client_repo.get_all_by_profile_id(profile.id)
+        
+        return clients
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener clientes: {str(e)}"
         )

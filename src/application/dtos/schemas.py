@@ -44,6 +44,7 @@ class ProfileCreateRequest(BaseModel):
     location: Optional[str] = "Cochabamba, Bolivia"
     phone: Optional[str] = None
     photo_url: Optional[str] = None
+    profile: Optional[str] = Field(None, max_length=2000)
 
 class ProfileUpdateRequest(BaseModel):
     name: Optional[str] = Field(None, min_length=2)
@@ -53,6 +54,7 @@ class ProfileUpdateRequest(BaseModel):
     location: Optional[str] = None
     phone: Optional[str] = None
     photo_url: Optional[str] = None
+    profile: Optional[str] = Field(None, max_length=2000)
 
 # OUTPUT: Lo que devuelve la API
 class ProfileResponse(BaseModel):
@@ -66,6 +68,7 @@ class ProfileResponse(BaseModel):
     location: Optional[str]
     phone: Optional[str]
     photo_url: Optional[str]
+    profile: Optional[str]
     
     class Config:
         from_attributes = True

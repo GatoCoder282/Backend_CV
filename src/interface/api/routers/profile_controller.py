@@ -4,6 +4,7 @@ from sqlmodel import Session
 # Imports de Infraestructura
 from src.infrastructure.data_base.main import get_session
 from src.infrastructure.repositories.profile_repository import SqlAlchemyProfileRepository
+from src.infrastructure.repositories.user_repository import SqlAlchemyUserRepository
 
 # Imports de Aplicación
 from src.application.services.profile_service import (
@@ -55,6 +56,7 @@ def create_profile(
             phone=profile_data.phone,
             location=profile_data.location,
             photo_url=profile_data.photo_url,
+            profile=profile_data.profile,
             created_by=current_user.id
         )
         return new_profile
@@ -107,7 +109,8 @@ def update_my_profile(
             bio_summary=profile_data.bio_summary,
             phone=profile_data.phone,
             location=profile_data.location,
-            photo_url=profile_data.photo_url
+            photo_url=profile_data.photo_url,
+            profile=profile_data.profile
         )
         return updated_profile
     except ProfileNotFoundError as e:
@@ -119,4 +122,43 @@ def update_my_profile(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
+        )
+
+# --- ENDPOINTS PÚBLICOS ---
+
+@router.get("/public/{username}", response_model=ProfileResponse)
+def get_public_profile(
+    username: str,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene el perfil de un usuario por su username.
+    No requiere autenticación.
+    """
+    try:
+        # Buscar usuario por username
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        # Buscar perfil del usuario
+        profile_repo = SqlAlchemyProfileRepository(session)
+        profile = profile_repo.get_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Perfil no encontrado."
+            )
+        
+        return profile
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener el perfil: {str(e)}"
         )

@@ -11,6 +11,7 @@ from src.infrastructure.repositories.project_repository import (
 )
 from src.infrastructure.repositories.profile_repository import SqlAlchemyProfileRepository
 from src.infrastructure.repositories.work_experience_repository import WorkExperienceRepository
+from src.infrastructure.repositories.user_repository import SqlAlchemyUserRepository
 
 # Imports de Aplicación
 from src.application.services.project_service import (
@@ -263,4 +264,151 @@ def delete_project(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(e)
+        )
+
+# --- ENDPOINTS PÚBLICOS ---
+
+@router.get("/public/{username}", response_model=List[ProjectResponse])
+def get_public_projects(
+    username: str,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene todos los proyectos de un usuario por su username.
+    No requiere autenticación.
+    """
+    try:
+        # Buscar usuario por username
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        # Buscar perfil del usuario
+        profile_repo = SqlAlchemyProfileRepository(session)
+        profile = profile_repo.get_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Perfil no encontrado."
+            )
+        
+        # Obtener proyectos
+        project_repo = SqlAlchemyProjectRepository(session)
+        projects = project_repo.get_all_by_profile_id(profile.id)
+        
+        # Construir respuestas con tecnologías y previews
+        tech_repo = SqlAlchemyProjectTechRepository(session)
+        preview_repo = SqlAlchemyProjectPreviewRepository(session)
+        return [build_project_response(p, tech_repo, preview_repo) for p in projects]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener proyectos: {str(e)}"
+        )
+
+@router.get("/public/{username}/featured", response_model=List[ProjectResponse])
+def get_public_featured_projects(
+    username: str,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene los proyectos destacados de un usuario por su username.
+    No requiere autenticación.
+    """
+    try:
+        # Buscar usuario por username
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        # Buscar perfil del usuario
+        profile_repo = SqlAlchemyProfileRepository(session)
+        profile = profile_repo.get_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Perfil no encontrado."
+            )
+        
+        # Obtener proyectos destacados
+        project_repo = SqlAlchemyProjectRepository(session)
+        projects = project_repo.get_featured_by_profile_id(profile.id)
+        
+        # Construir respuestas con tecnologías y previews
+        tech_repo = SqlAlchemyProjectTechRepository(session)
+        preview_repo = SqlAlchemyProjectPreviewRepository(session)
+        return [build_project_response(p, tech_repo, preview_repo) for p in projects]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener proyectos destacados: {str(e)}"
+        )
+
+@router.get("/public/{username}/{project_id}", response_model=ProjectResponse)
+def get_public_project(
+    username: str,
+    project_id: int,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene un proyecto específico de un usuario por su username.
+    No requiere autenticación.
+    """
+    try:
+        # Buscar usuario por username
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        # Buscar perfil del usuario
+        profile_repo = SqlAlchemyProfileRepository(session)
+        profile = profile_repo.get_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Perfil no encontrado."
+            )
+        
+        # Obtener proyecto
+        project_repo = SqlAlchemyProjectRepository(session)
+        project = project_repo.get_by_id(project_id)
+        if not project:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Proyecto no encontrado."
+            )
+        
+        # Verificar que el proyecto pertenezca al usuario
+        if project.profile_id != profile.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Proyecto no encontrado."
+            )
+        
+        # Construir respuesta con tecnologías y previews
+        tech_repo = SqlAlchemyProjectTechRepository(session)
+        preview_repo = SqlAlchemyProjectPreviewRepository(session)
+        return build_project_response(project, tech_repo, preview_repo)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener proyecto: {str(e)}"
         )
