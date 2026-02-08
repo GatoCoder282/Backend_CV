@@ -10,6 +10,7 @@ from src.infrastructure.repositories.project_repository import (
     SqlAlchemyProjectPreviewRepository
 )
 from src.infrastructure.repositories.profile_repository import SqlAlchemyProfileRepository
+from src.infrastructure.repositories.technology_repository import SqlAlchemyTechnologyRepository
 from src.infrastructure.repositories.work_experience_repository import WorkExperienceRepository
 from src.infrastructure.repositories.user_repository import SqlAlchemyUserRepository
 
@@ -23,7 +24,8 @@ from src.application.dtos.schemas import (
     ProjectCreateRequest,
     ProjectUpdateRequest,
     ProjectResponse,
-    ProjectPreviewResponse
+    ProjectPreviewResponse,
+    TechnologyResponse
 )
 
 # Imports de Interface (Dependencias)
@@ -55,9 +57,25 @@ def get_project_service(session: Session = Depends(get_session)) -> ProjectServi
 def build_project_response(
     project,
     project_tech_repo: SqlAlchemyProjectTechRepository,
+    tech_repo: SqlAlchemyTechnologyRepository,
     project_preview_repo: SqlAlchemyProjectPreviewRepository
 ) -> ProjectResponse:
+    # Obtener IDs de tecnologías
     tech_ids = project_tech_repo.get_technologies_by_project_id(project.id)
+    
+    # Convertir IDs a objetos completos de Technology
+    technologies = []
+    for tech_id in tech_ids:
+        tech = tech_repo.get_by_id(tech_id)
+        if tech:
+            technologies.append(TechnologyResponse(
+                id=tech.id,
+                profile_id=tech.profile_id,
+                name=tech.name,
+                category=tech.category,
+                icon_url=tech.icon_url
+            ))
+    
     previews = project_preview_repo.get_by_project_id(project.id)
     preview_responses = [
         ProjectPreviewResponse(
@@ -79,7 +97,7 @@ def build_project_response(
         repo_url=project.repo_url,
         featured=project.featured,
         work_experience_id=project.work_experience_id,
-        technology_ids=tech_ids,
+        technologies=technologies,
         previews=preview_responses
     )
 
@@ -113,6 +131,7 @@ def create_project(
         return build_project_response(
             project,
             SqlAlchemyProjectTechRepository(session),
+            SqlAlchemyTechnologyRepository(session),
             SqlAlchemyProjectPreviewRepository(session)
         )
     except DomainException as e:
@@ -138,8 +157,9 @@ def get_my_projects(
     try:
         projects = service.get_all_my_projects(current_user.id)
         tech_repo = SqlAlchemyProjectTechRepository(session)
+        technology_repo = SqlAlchemyTechnologyRepository(session)
         preview_repo = SqlAlchemyProjectPreviewRepository(session)
-        return [build_project_response(p, tech_repo, preview_repo) for p in projects]
+        return [build_project_response(p, tech_repo, technology_repo, preview_repo) for p in projects]
     except DomainException as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -158,8 +178,9 @@ def get_my_featured_projects(
     try:
         projects = service.get_featured_my_projects(current_user.id)
         tech_repo = SqlAlchemyProjectTechRepository(session)
+        technology_repo = SqlAlchemyTechnologyRepository(session)
         preview_repo = SqlAlchemyProjectPreviewRepository(session)
-        return [build_project_response(p, tech_repo, preview_repo) for p in projects]
+        return [build_project_response(p, tech_repo, technology_repo, preview_repo) for p in projects]
     except DomainException as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -181,6 +202,7 @@ def get_project(
         return build_project_response(
             project,
             SqlAlchemyProjectTechRepository(session),
+            SqlAlchemyTechnologyRepository(session),
             SqlAlchemyProjectPreviewRepository(session)
         )
     except ProjectNotFoundError as e:
@@ -224,6 +246,7 @@ def update_project(
         return build_project_response(
             project,
             SqlAlchemyProjectTechRepository(session),
+            SqlAlchemyTechnologyRepository(session),
             SqlAlchemyProjectPreviewRepository(session)
         )
     except ProjectNotFoundError as e:
@@ -302,8 +325,9 @@ def get_public_projects(
         
         # Construir respuestas con tecnologías y previews
         tech_repo = SqlAlchemyProjectTechRepository(session)
+        technology_repo = SqlAlchemyTechnologyRepository(session)
         preview_repo = SqlAlchemyProjectPreviewRepository(session)
-        return [build_project_response(p, tech_repo, preview_repo) for p in projects]
+        return [build_project_response(p, tech_repo, technology_repo, preview_repo) for p in projects]
     except HTTPException:
         raise
     except Exception as e:
@@ -346,8 +370,9 @@ def get_public_featured_projects(
         
         # Construir respuestas con tecnologías y previews
         tech_repo = SqlAlchemyProjectTechRepository(session)
+        technology_repo = SqlAlchemyTechnologyRepository(session)
         preview_repo = SqlAlchemyProjectPreviewRepository(session)
-        return [build_project_response(p, tech_repo, preview_repo) for p in projects]
+        return [build_project_response(p, tech_repo, technology_repo, preview_repo) for p in projects]
     except HTTPException:
         raise
     except Exception as e:
@@ -403,8 +428,9 @@ def get_public_project(
         
         # Construir respuesta con tecnologías y previews
         tech_repo = SqlAlchemyProjectTechRepository(session)
+        technology_repo = SqlAlchemyTechnologyRepository(session)
         preview_repo = SqlAlchemyProjectPreviewRepository(session)
-        return build_project_response(project, tech_repo, preview_repo)
+        return build_project_response(project, tech_repo, technology_repo, preview_repo)
     except HTTPException:
         raise
     except Exception as e:

@@ -31,3 +31,26 @@ class CloudinaryService:
 			timeout=60  # Timeout de 60 segundos para Cloudinary
 		)
 		return result["secure_url"]
+
+	def upload_pdf(
+		self,
+		file,
+		folder: Optional[str] = None,
+		public_id: Optional[str] = None,
+		filename: Optional[str] = None
+	) -> str:
+		"""
+		Sube un PDF a Cloudinary y retorna la URL segura.
+		Usa resource_type="raw" para evitar conversion a imagen.
+		"""
+		file_to_upload = (filename, file) if filename else file
+		result = cloudinary.uploader.upload(
+			file_to_upload,
+			folder=folder,
+			public_id=public_id,
+			resource_type="raw",
+			use_filename=bool(filename),
+			unique_filename=True,
+			timeout=60
+		)
+		return result["secure_url"]

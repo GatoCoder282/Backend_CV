@@ -98,3 +98,34 @@ def admin_zone(
         "message": f"Acceso concedido al panel de control.",
         "admin_user": current_user.username
     }
+
+# --- ENDPOINTS PÚBLICOS ---
+
+@router.get("/public/{username}", response_model=UserResponse)
+def get_public_user(
+    username: str,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene la información de un usuario por su username.
+    No requiere autenticación.
+    Retorna: id, username, email, role
+    """
+    try:
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        return user
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener usuario: {str(e)}"
+        )

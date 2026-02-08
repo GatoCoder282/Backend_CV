@@ -22,6 +22,7 @@ class SqlAlchemyProfileRepository(ProfileRepository):
 			location=model.location,
 			photo_url=model.photo_url,
 			profile=model.profile,
+			cv_url=model.cv_url,
 			created_at=model.created_at,
 			updated_at=model.updated_at,
 			created_by=model.created_by,
@@ -42,6 +43,7 @@ class SqlAlchemyProfileRepository(ProfileRepository):
 			location=entity.location,
 			photo_url=entity.photo_url,
 			profile=entity.profile,
+			cv_url=entity.cv_url,
 			created_at=entity.created_at,
 			updated_at=entity.updated_at,
 			created_by=entity.created_by,
@@ -80,6 +82,7 @@ class SqlAlchemyProfileRepository(ProfileRepository):
 			existing_model.location = profile.location
 			existing_model.photo_url = profile.photo_url
 			existing_model.profile = profile.profile
+			existing_model.cv_url = profile.cv_url
 			existing_model.updated_at = profile.updated_at
 			existing_model.updated_by = profile.updated_by
 			existing_model.is_active = profile.is_active

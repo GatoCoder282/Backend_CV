@@ -38,3 +38,31 @@ async def upload_image(
 			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 			detail=f"Error al subir imagen: {str(e)}"
 		)
+
+
+@router.post("/upload-pdf", status_code=status.HTTP_201_CREATED)
+async def upload_pdf(
+	file: UploadFile = File(...),
+	folder: Optional[str] = None,
+	current_user: User = Depends(get_current_admin),
+	service: CloudinaryService = Depends(get_cloudinary_service)
+):
+	"""
+	Sube un PDF a Cloudinary y devuelve la URL.
+	Solo ADMIN puede subir.
+	"""
+	if not file.content_type or file.content_type != "application/pdf":
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="El archivo debe ser un PDF."
+		)
+
+	try:
+		file_bytes = await file.read()
+		url = service.upload_pdf(file_bytes, folder=folder, filename=file.filename)
+		return {"url": url}
+	except Exception as e:
+		raise HTTPException(
+			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+			detail=f"Error al subir PDF: {str(e)}"
+		)

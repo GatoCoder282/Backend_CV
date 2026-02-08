@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: portfolio-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 src.main:app
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: prod

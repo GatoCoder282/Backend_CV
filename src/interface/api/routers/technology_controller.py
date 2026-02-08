@@ -209,3 +209,58 @@ def get_public_technologies(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener tecnologías: {str(e)}"
         )
+
+@router.get("/public/{username}/{tech_id}", response_model=TechnologyResponse)
+def get_public_technology(
+    username: str,
+    tech_id: int,
+    session: Session = Depends(get_session)
+):
+    """
+    Endpoint público: Obtiene una tecnología específica de un usuario por su username y tech_id.
+    No requiere autenticación.
+    """
+    try:
+        # Buscar usuario por username
+        user_repo = SqlAlchemyUserRepository(session)
+        user = user_repo.get_by_username(username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado."
+            )
+        
+        # Buscar perfil del usuario
+        profile_repo = SqlAlchemyProfileRepository(session)
+        profile = profile_repo.get_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Perfil no encontrado."
+            )
+        
+        # Obtener tecnología
+        tech_repo = SqlAlchemyTechnologyRepository(session)
+        technology = tech_repo.get_by_id(tech_id)
+        
+        if not technology:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Tecnología no encontrada."
+            )
+        
+        # Verificar que la tecnología pertenezca al usuario
+        if technology.profile_id != profile.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Tecnología no encontrada."
+            )
+        
+        return technology
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener tecnología: {str(e)}"
+        )

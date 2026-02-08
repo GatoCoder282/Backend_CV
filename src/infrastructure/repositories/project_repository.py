@@ -171,17 +171,14 @@ class SqlAlchemyProjectTechRepository(ProjectTechRepository):
         return self._to_domain(model)
 
     def delete_by_project_id(self, project_id: int) -> bool:
-        """Soft delete de todas las asociaciones de tecnologías de un proyecto."""
+        """Elimina todas las asociaciones de tecnologías de un proyecto (hard delete)."""
         stmt = select(ProjectTechModel).where(
-            ProjectTechModel.project_id == project_id,
-            ProjectTechModel.is_active == True
+            ProjectTechModel.project_id == project_id
         )
         models = self.session.exec(stmt).all()
         
         for model in models:
-            model.is_active = False
-            model.updated_at = datetime.now()
-            self.session.add(model)
+            self.session.delete(model)
         
         self.session.commit()
         return True

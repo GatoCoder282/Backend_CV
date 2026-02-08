@@ -91,8 +91,9 @@ class ProjectService:
 
 		project = self.project_repository.save(new_project)
 
-		# Asociar tecnologías
-		for tech_id in technology_ids or []:
+		# Asociar tecnologías (sin duplicados)
+		unique_tech_ids = list(set(technology_ids or []))
+		for tech_id in unique_tech_ids:
 			self.project_tech_repository.save(
 				ProjectTech(
 					project_id=project.id,
@@ -174,8 +175,14 @@ class ProjectService:
 
 		# Actualizar tecnologías (reemplazo total si se envían)
 		if technology_ids is not None:
+			# Deduplicar technologías para evitar duplicados
+			unique_tech_ids = list(set(technology_ids))
+			
+			# Eliminar todas las tecnologías anteriores
 			self.project_tech_repository.delete_by_project_id(project.id)
-			for tech_id in technology_ids:
+			
+			# Insertar las nuevas tecnologías (sin duplicados)
+			for tech_id in unique_tech_ids:
 				self.project_tech_repository.save(
 					ProjectTech(
 						project_id=project.id,

@@ -41,6 +41,7 @@ class ProfileModel(SQLModel, table=True):
     location: Optional[str] = "Cochabamba, Bolivia"
     photo_url: Optional[str] = None
     profile: Optional[str] = Field(default=None, max_length=2000) # Campo de tipo string para descripción del perfil
+    cv_url: Optional[str] = None  # URL del CV en formato PDF
     
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: Optional[datetime] = None

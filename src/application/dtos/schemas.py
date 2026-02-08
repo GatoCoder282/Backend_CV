@@ -45,6 +45,7 @@ class ProfileCreateRequest(BaseModel):
     phone: Optional[str] = None
     photo_url: Optional[str] = None
     profile: Optional[str] = Field(None, max_length=2000)
+    cv_url: Optional[str] = None
 
 class ProfileUpdateRequest(BaseModel):
     name: Optional[str] = Field(None, min_length=2)
@@ -55,6 +56,7 @@ class ProfileUpdateRequest(BaseModel):
     phone: Optional[str] = None
     photo_url: Optional[str] = None
     profile: Optional[str] = Field(None, max_length=2000)
+    cv_url: Optional[str] = None
 
 # OUTPUT: Lo que devuelve la API
 class ProfileResponse(BaseModel):
@@ -69,6 +71,7 @@ class ProfileResponse(BaseModel):
     phone: Optional[str]
     photo_url: Optional[str]
     profile: Optional[str]
+    cv_url: Optional[str]
     
     class Config:
         from_attributes = True
@@ -181,7 +184,7 @@ class ProjectResponse(BaseModel):
     repo_url: Optional[str]
     featured: bool
     work_experience_id: Optional[int]
-    technology_ids: List[int] = []
+    technologies: List[TechnologyResponse] = []
     previews: List[ProjectPreviewResponse] = []
 
     class Config:
