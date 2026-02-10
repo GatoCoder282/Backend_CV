@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = Field(...)
     cloudinary_api_secret: str = Field(...)
 
+    supabase_url: str = Field(...)
+    supabase_api_key: str = Field(...)
+    supabase_service_key: str = Field(...)
+    supabase_bucket_name: str = Field(default="porty_pdfs")
+
     # Configuración para leer el archivo .env
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

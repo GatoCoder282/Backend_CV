@@ -32,6 +32,7 @@ class ProfileService:
 		location: Optional[str] = None,
 		photo_url: Optional[str] = None,
 		profile: Optional[str] = None,
+		cv_url: Optional[str] = None,
 		created_by: Optional[int] = None,
 		is_active: bool = True
 	) -> Profile:
@@ -52,6 +53,7 @@ class ProfileService:
 			location=location,
 			photo_url=photo_url,
 			profile=profile,
+			cv_url=cv_url,
 			created_by=created_by or user_id,
 			is_active=is_active
 		)
@@ -78,6 +80,7 @@ class ProfileService:
 		phone: Optional[str] = None,
 		location: Optional[str] = None,
 		photo_url: Optional[str] = None,
+		cv_url: Optional[str] = None,
 		profile: Optional[str] = None,
 		is_active: Optional[bool] = None
 	) -> Profile:
@@ -100,6 +103,7 @@ class ProfileService:
 			location=location if location is not None else existing.location,
 			photo_url=photo_url if photo_url is not None else existing.photo_url,
 			profile=profile if profile is not None else existing.profile,
+			cv_url=cv_url if cv_url is not None else existing.cv_url,
 			created_at=existing.created_at,
 			updated_at=datetime.now(),
 			created_by=existing.created_by,

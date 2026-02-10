@@ -57,6 +57,7 @@ def create_profile(
             location=profile_data.location,
             photo_url=profile_data.photo_url,
             profile=profile_data.profile,
+            cv_url=profile_data.cv_url,
             created_by=current_user.id
         )
         return new_profile
@@ -110,7 +111,8 @@ def update_my_profile(
             phone=profile_data.phone,
             location=profile_data.location,
             photo_url=profile_data.photo_url,
-            profile=profile_data.profile
+            profile=profile_data.profile,
+            cv_url=profile_data.cv_url
         )
         return updated_profile
     except ProfileNotFoundError as e:

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from typing import Optional
 
 from src.application.services.cloudinary_service import CloudinaryService
+from src.application.services.supabase_service import SupabaseService
 from src.interface.api.authorization import get_current_admin
 from src.domain.entities import User
 
@@ -10,6 +11,10 @@ router = APIRouter(prefix="/images", tags=["Images"])
 
 def get_cloudinary_service() -> CloudinaryService:
 	return CloudinaryService()
+
+
+def get_supabase_service() -> SupabaseService:
+	return SupabaseService()
 
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
@@ -45,10 +50,10 @@ async def upload_pdf(
 	file: UploadFile = File(...),
 	folder: Optional[str] = None,
 	current_user: User = Depends(get_current_admin),
-	service: CloudinaryService = Depends(get_cloudinary_service)
+	service: SupabaseService = Depends(get_supabase_service)
 ):
 	"""
-	Sube un PDF a Cloudinary y devuelve la URL.
+	Sube un PDF a Supabase Storage y devuelve la URL.
 	Solo ADMIN puede subir.
 	"""
 	if not file.content_type or file.content_type != "application/pdf":
@@ -59,7 +64,7 @@ async def upload_pdf(
 
 	try:
 		file_bytes = await file.read()
-		url = service.upload_pdf(file_bytes, folder=folder, filename=file.filename)
+		url = service.upload_pdf(file_bytes, filename=file.filename, folder=folder)
 		return {"url": url}
 	except Exception as e:
 		raise HTTPException(

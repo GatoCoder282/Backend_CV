@@ -16,3 +16,4 @@ alembic==1.14.0
 psycopg[binary]==3.3.2
 asyncpg==0.31.0
 slowapi==0.1.9
+supabase==2.27.3
