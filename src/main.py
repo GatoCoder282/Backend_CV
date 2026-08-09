@@ -36,6 +36,7 @@ from src.infrastructure.config import settings
 if settings.environment == "prod":
     origins = [
         "https://frontend-cv-ten.vercel.app",
+        "https://portfolio.gatocoder282.dev/",
     ]
 else:
     origins = [
